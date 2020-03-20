@@ -1,5 +1,9 @@
 package br.ce.wcaquino.servicos;
 
+import static br.ce.wcaquino.builders.FilmeBuilder.umFilme;
+import static br.ce.wcaquino.builders.UsuarioBuilder.usiBuilder;
+import static br.ce.wcaquino.matchers.MatchersProprios.ehHoje;
+import static br.ce.wcaquino.matchers.MatchersProprios.ehHojeComDiferencaDias;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -46,8 +50,8 @@ public class LocalizacaoServiceTeste {
 		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SUNDAY));
 		
 		// cenario
-		Usuario usuario = new Usuario("Leandro");
-		List<Filme> filmes = Arrays.asList( new Filme("Titanic", 10, 5.0));
+		Usuario usuario = usiBuilder().agora();
+		List<Filme> filmes = Arrays.asList( umFilme().agora());
 
 		// acao
 		Locacao locacao = service.alugarFilme(usuario, filmes);
@@ -55,16 +59,19 @@ public class LocalizacaoServiceTeste {
 		// verificacao
 		error.checkThat(locacao.getValor(), is(equalTo(5.0)));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
-		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),
-				is(true));
-
+		error.checkThat(locacao.getDataLocacao(), ehHoje());
+		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),is(true));
+		error.checkThat(locacao.getDataRetorno(), ehHojeComDiferencaDias(1));
+		
+		
+		
 	}
 
 	@Test(expected = FilmeSemEstoqueExceptions.class)
 	public void naoDeveAlugarFilmeSemEstoque() throws Exception {
 		// cenario
-		Usuario usuario = new Usuario("Leandro");
-		List<Filme> filmes = Arrays.asList( new Filme("Titanic", 0, 4.0));
+		Usuario usuario = usiBuilder().agora();;
+		List<Filme> filmes = Arrays.asList( umFilme().comValor(5.0).agora());
 
 		// acao
 		 service.alugarFilme(usuario, filmes);
@@ -74,7 +81,7 @@ public class LocalizacaoServiceTeste {
 	@Test
 	public void naoDeveAlugarFilmeSemUsuario() throws FilmeSemEstoqueExceptions {
 		// cenario
-		List<Filme> filmes = Arrays.asList( new Filme("Titanic", 10, 5.0));
+		List<Filme> filmes = Arrays.asList( umFilme().agora());
 
 		// Acao
 		try {
@@ -89,7 +96,7 @@ public class LocalizacaoServiceTeste {
 	@Test
 	public void naodeveAlugarFilmeSemFilme() throws FilmeSemEstoqueExceptions, LocadoraException {
 		// Cenário
-		Usuario usuario = new Usuario("Leandro");
+		Usuario usuario = usiBuilder().agora();
 
 		exception.expect(LocadoraException.class);
 		exception.expectMessage("Filme vazio");
@@ -104,8 +111,8 @@ public class LocalizacaoServiceTeste {
 	
 		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SUNDAY));	
 		//cenário
-		Usuario usuario = new Usuario("Usuario 1");
-		List<Filme> filmes  = Arrays.asList(new Filme("Filme 1",2,5.0));
+		Usuario usuario = usiBuilder().agora();
+		List<Filme> filmes  = Arrays.asList(umFilme().agora());
 		
 		//Ação
 		Locacao retorno =service.alugarFilme(usuario,filmes);
@@ -114,7 +121,7 @@ public class LocalizacaoServiceTeste {
 		boolean ehSegunda= DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
 		Assert.assertTrue(ehSegunda);
 		Assert.assertThat(retorno.getDataRetorno(), MatchersProprios.caiEm(Calendar.MONDAY));
-//		Assert.assertThat(retorno.getDataRetorno(), caiNaSegunda());
+		Assert.assertThat(retorno.getDataRetorno(), MatchersProprios.caiNumaSegunda());
 		
 		
 	}

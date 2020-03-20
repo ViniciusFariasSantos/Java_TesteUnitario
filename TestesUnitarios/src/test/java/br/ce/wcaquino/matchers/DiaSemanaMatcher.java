@@ -1,6 +1,8 @@
 package br.ce.wcaquino.matchers;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
@@ -18,9 +20,11 @@ public class DiaSemanaMatcher extends TypeSafeMatcher<Date> {
 	
 	
 	
-	public void describeTo(Description arg0) {
-		// TODO Auto-generated method stub
-		
+	public void describeTo(Description desc) {
+		Calendar data = Calendar.getInstance();
+		data.set(Calendar.DAY_OF_WEEK, diaSemana);
+		String DataExtenso = data.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG,new Locale("pt","br"));
+		desc.appendText(DataExtenso);
 	}
 
 	
