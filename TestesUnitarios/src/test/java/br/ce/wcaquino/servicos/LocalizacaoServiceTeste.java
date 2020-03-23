@@ -22,6 +22,8 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import br.ce.wcaquino.daos.LocacaoDAO;
+import br.ce.wcaquino.daos.LocacaoDAOFake;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -44,6 +46,8 @@ public class LocalizacaoServiceTeste {
 	@Before
 	public void setup() {
 		service = new LocacaoService();
+		LocacaoDAO dao = new LocacaoDAOFake();
+		service.setLocacaoDAO(dao);
 	}
 	
 	@Test
@@ -53,17 +57,17 @@ public class LocalizacaoServiceTeste {
 		
 		// cenario
 		Usuario usuario = usiBuilder().agora();
-		List<Filme> filmes = Arrays.asList( umFilme().comValor(5.0).agora());
+		List<Filme> filmes = Arrays.asList( umFilme().comValor(4.0).agora());
 
 		// acao
 		Locacao locacao = service.alugarFilme(usuario, filmes);
 
 		// verificacao
-		error.checkThat(locacao.getValor(), is(equalTo(5.0)));
+		error.checkThat(locacao.getValor(), is(equalTo(4.0)));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
 		error.checkThat(locacao.getDataLocacao(), ehHoje());
-		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),is(true));
-		error.checkThat(locacao.getDataRetorno(), ehHojeComDiferencaDias(1));
+		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),is(false));
+		error.checkThat(locacao.getDataRetorno(), ehHojeComDiferencaDias(0));
 		
 		
 		
@@ -73,7 +77,7 @@ public class LocalizacaoServiceTeste {
 	public void naoDeveAlugarFilmeSemEstoque() throws Exception {
 		// cenario
 		Usuario usuario = usiBuilder().agora();;
-		List<Filme> filmes = Arrays.asList(umFilmeSemEstoque().agora());
+		List<Filme> filmes = Arrays.asList(umFilmeSemEstoque().comValor(4.0).agora());
 
 		// acao
 		 service.alugarFilme(usuario, filmes);
@@ -107,6 +111,7 @@ public class LocalizacaoServiceTeste {
 		service.alugarFilme(usuario, null);
 
 	}
+	
 	
 	@Test 
 	public void deveDevolverFilmeNoDomingo () throws FilmeSemEstoqueExceptions, LocadoraException {

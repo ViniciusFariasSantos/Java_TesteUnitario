@@ -16,7 +16,7 @@ public class FilmeBuilder {
 		builder.filme = new Filme();
 		builder.filme.setEstoque(0);
 		builder .filme.setNome("Filme 1");
-		builder.filme.setPrecoLocacao(5.0);
+		builder.filme.setPrecoLocacao(4.0);
 		return builder;
 	}
 	
@@ -27,7 +27,7 @@ public class FilmeBuilder {
 		builder.filme = new Filme();
 		builder.filme.setEstoque(2);
 		builder .filme.setNome("Filme 1");
-		builder.filme.setPrecoLocacao(5.0);
+		builder.filme.setPrecoLocacao(4.0);
 		return builder;
 	}
 	
