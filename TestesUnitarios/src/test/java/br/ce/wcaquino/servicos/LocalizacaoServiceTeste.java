@@ -1,6 +1,7 @@
 package br.ce.wcaquino.servicos;
 
 import static br.ce.wcaquino.builders.FilmeBuilder.umFilme;
+import static br.ce.wcaquino.builders.FilmeBuilder.umFilmeSemEstoque;
 import static br.ce.wcaquino.builders.UsuarioBuilder.usiBuilder;
 import static br.ce.wcaquino.matchers.MatchersProprios.ehHoje;
 import static br.ce.wcaquino.matchers.MatchersProprios.ehHojeComDiferencaDias;
@@ -28,6 +29,7 @@ import br.ce.wcaquino.exceptions.FilmeSemEstoqueExceptions;
 import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.matchers.MatchersProprios;
 import br.ce.wcaquino.utils.DataUtils;
+import buildermaster.BuilderMaster;
 
 public class LocalizacaoServiceTeste {
 
@@ -51,7 +53,7 @@ public class LocalizacaoServiceTeste {
 		
 		// cenario
 		Usuario usuario = usiBuilder().agora();
-		List<Filme> filmes = Arrays.asList( umFilme().agora());
+		List<Filme> filmes = Arrays.asList( umFilme().comValor(5.0).agora());
 
 		// acao
 		Locacao locacao = service.alugarFilme(usuario, filmes);
@@ -71,7 +73,7 @@ public class LocalizacaoServiceTeste {
 	public void naoDeveAlugarFilmeSemEstoque() throws Exception {
 		// cenario
 		Usuario usuario = usiBuilder().agora();;
-		List<Filme> filmes = Arrays.asList( umFilme().comValor(5.0).agora());
+		List<Filme> filmes = Arrays.asList(umFilmeSemEstoque().agora());
 
 		// acao
 		 service.alugarFilme(usuario, filmes);
@@ -125,6 +127,10 @@ public class LocalizacaoServiceTeste {
 		
 		
 	}
+	public static void main (String[] args) {
+		new BuilderMaster().gerarCodigoClasse(Locacao.class);
+	}
+	
 }
 
 
