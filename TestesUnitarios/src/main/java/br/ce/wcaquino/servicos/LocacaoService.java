@@ -60,6 +60,8 @@ public class LocacaoService {
 		if(DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
 			dataEntrega = adicionarDias(dataEntrega, 1);
 			
+			
+			
 		}
 		locacao.setDataRetorno(dataEntrega);
 
