@@ -9,6 +9,7 @@ import br.ce.wcaquino.servicos.CalculadoraTeste;
 import br.ce.wcaquino.servicos.CalculoVaolorLocacaoTest;
 import br.ce.wcaquino.servicos.LocacaoService;
 
+
 @RunWith(Suite.class)
 @SuiteClasses({ CalculadoraTeste.class, CalculoVaolorLocacaoTest.class, LocacaoService.class })
 public class SuiteExecucao {

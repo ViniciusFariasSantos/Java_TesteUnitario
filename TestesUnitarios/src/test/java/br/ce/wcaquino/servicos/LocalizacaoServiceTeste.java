@@ -8,6 +8,7 @@ import static br.ce.wcaquino.matchers.MatchersProprios.ehHojeComDiferencaDias;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -21,9 +22,9 @@ import  org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import br.ce.wcaquino.daos.LocacaoDAO;
-import br.ce.wcaquino.daos.LocacaoDAOFake;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -36,6 +37,8 @@ import buildermaster.BuilderMaster;
 public class LocalizacaoServiceTeste {
 
 	private LocacaoService service;
+	private LocacaoDAO dao ;
+	private SPCService spc;
 
 	@Rule
 	public ErrorCollector error = new ErrorCollector();
@@ -46,8 +49,10 @@ public class LocalizacaoServiceTeste {
 	@Before
 	public void setup() {
 		service = new LocacaoService();
-		LocacaoDAO dao = new LocacaoDAOFake();
+		dao = Mockito.mock(LocacaoDAO.class);
 		service.setLocacaoDAO(dao);
+		spc = Mockito.mock(SPCService.class);
+		service.setSPCService(spc);
 	}
 	
 	@Test
@@ -66,8 +71,8 @@ public class LocalizacaoServiceTeste {
 		error.checkThat(locacao.getValor(), is(equalTo(4.0)));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
 		error.checkThat(locacao.getDataLocacao(), ehHoje());
-		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),is(false));
-		error.checkThat(locacao.getDataRetorno(), ehHojeComDiferencaDias(0));
+		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),is(true));
+		error.checkThat(locacao.getDataRetorno(), ehHojeComDiferencaDias(1));
 		
 		
 		
@@ -135,6 +140,28 @@ public class LocalizacaoServiceTeste {
 	public static void main (String[] args) {
 		new BuilderMaster().gerarCodigoClasse(Locacao.class);
 	}
+	
+	
+	
+	@Test
+	public void naoDeveAlugarFilmeParaNegativadoSPC() throws FilmeSemEstoqueExceptions, LocadoraException {
+		//cenario
+		Usuario usuario = usiBuilder().agora();
+		List<Filme> filmes = Arrays.asList(umFilme().agora() );
+		
+		
+		when(spc.possuiNegativacao(usuario)).thenReturn(true);
+		
+		exception.expect(LocadoraException.class);
+		exception.expectMessage("Usuario Negativado");
+		//Ação 
+		service.alugarFilme(usuario, filmes);
+		
+		//verificação 
+		
+		
+	}
+	
 	
 }
 
