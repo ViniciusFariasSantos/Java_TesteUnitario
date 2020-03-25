@@ -147,13 +147,14 @@ public class LocalizacaoServiceTeste {
 	public void naoDeveAlugarFilmeParaNegativadoSPC() throws FilmeSemEstoqueExceptions, LocadoraException {
 		//cenario
 		Usuario usuario = usiBuilder().agora();
+		Usuario usuario2 = usiBuilder().comNome("Usuario 2").agora();
 		List<Filme> filmes = Arrays.asList(umFilme().agora() );
 		
 		
 		when(spc.possuiNegativacao(usuario)).thenReturn(true);
 		
 		exception.expect(LocadoraException.class);
-		exception.expectMessage("Usuario Negativado");
+		exception.expectMessage("Usuario Negativado");;
 		//Ação 
 		service.alugarFilme(usuario, filmes);
 		
