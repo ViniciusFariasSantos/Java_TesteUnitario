@@ -1,6 +1,7 @@
 package br.ce.wcaquino.servicos;
 
 import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
+import static org.mockito.Matchers.booleanThat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -42,7 +43,16 @@ public class LocacaoService {
 			}
 		}
 		
-		if(spcService.possuiNegativacao(usuario)) {
+		boolean negativado;
+		
+		try {
+			negativado = spcService.possuiNegativacao(usuario);
+			
+		
+		} catch (Exception e) {
+			throw new LocadoraException("Problemas com SPC, tente novamente");
+		}
+		if(negativado) {
 			throw new LocadoraException("Usuario Negativado");
 		}
 
@@ -50,7 +60,7 @@ public class LocacaoService {
 		locacao.setFilmes(filmes);
 		locacao.setUsuario(usuario);
 		locacao.setDataLocacao(new Date());
-		Double valorTotal = 0d;
+		Double valorTotal = 0.0;
 		for (int i = 0; i < filmes.size(); i++) {
 
 			Filme filme = filmes.get(i);
@@ -67,7 +77,7 @@ public class LocacaoService {
 				valorFilme = valorFilme * 0.25;
 				break;
 			case 5:
-				valorFilme = valorFilme * 0;
+				valorFilme = valorFilme * 0.0;
 				break;
 
 			}
@@ -99,25 +109,14 @@ public class LocacaoService {
 	public void notificarAtasos(){
 		List<Locacao> locacoes = dao.obterLocacoesPedente();
 		for(Locacao locacao: locacoes) {
-			
+			if(locacao.getDataRetorno().before(new Date())) {
 			emailService.notificarAtraso(locacao.getUsuario());
+			}
 		}
 		
-		
 	}
 	
-	
-	public void setLocacaoDAO(LocacaoDAO dao) {
-		this.dao = dao;
-	}
-	
-	public void setSPCService(SPCService spc) {
-		spcService = spc;
-	}
-	
-	public void setEmailService(EmailService email) {
-		emailService = email;
-	}
+
 	
 }
 

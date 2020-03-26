@@ -15,9 +15,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.ce.wcaquino.daos.LocacaoDAO;
-import br.ce.wcaquino.daos.LocacaoDAOFake;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -26,70 +28,59 @@ import br.ce.wcaquino.exceptions.LocadoraException;
 
 @RunWith(Parameterized.class)
 public class CalculoVaolorLocacaoTest {
-	
+	@InjectMocks
 	private LocacaoService service;
 	
-	@Parameter
-	public List<Filme> filmes;
+	@Mock
+	private SPCService spc;
 	
-	@Parameter(value= 1)
-	public Double ValorLocacao;
-	
-	@Parameter(value= 2)
-	public String cenario;
-	
+	@Mock
+	private LocacaoDAO dao;
+
 	@Before
 	public void setup() {
-		service = new LocacaoService();
-		LocacaoDAO dao = new LocacaoDAOFake();
-		service.setLocacaoDAO(dao);
-	}
-	
-	
-	
-	private static Filme filme1 = umFilme().agora();
-	private static Filme filme2 = umFilme().agora();
-	private static Filme filme3 = umFilme().agora();
-	private static Filme filme4 = umFilme().agora();
-	private static Filme filme5 = umFilme().agora();
-	private static Filme filme6 = umFilme().agora();
-	private static Filme filme7 = umFilme().agora();
-	
-	@Parameters(name = "{2}")
-	public static Collection<Object[]> getParametros(){
-		return Arrays.asList(new Object[][]{
-			{ Arrays.asList(filme1, filme2),8.0, "2 Filmes Sem desconto"},
-			{ Arrays.asList(filme1, filme2,filme3),11.0, "3 Filmes 25%"},
-			{ Arrays.asList(filme1, filme2,filme3,filme4),13.0, "4 Filmes 50%"},
-			{ Arrays.asList(filme1, filme2,filme3,filme4,filme5),14.0, "5 Filmes 75%"},	
-			{ Arrays.asList(filme1, filme2,filme3,filme4,filme5,filme6),14.0, "6 Filmes 100%"},	
-			{ Arrays.asList(filme1, filme2,filme3,filme4,filme5,filme6,filme7),18.0, "7 Filmes Sem desconto"}
-			
-		});
+		MockitoAnnotations.initMocks(this);
 	}
 
+	@Parameter
+	public List<Filme> filmes;
+	@Parameter(value = 1)
+	public Double valorLocacao;
+	@Parameter(value = 2)
+	public String cenario;
+
+	private static Filme sonic = umFilme().agora();
+	private static Filme frozeen2 = umFilme().agora();
+	private static Filme clubeDaLuta = umFilme().agora();
+	private static Filme senhorDosAneis = umFilme().agora();
+	private static Filme harryPoter = umFilme().agora();
+	private static Filme asBranquelas= umFilme().agora();
+	private static Filme genteGrande = umFilme().agora();
 	
-	
-	
-	
-	@Test 
-	public void deveCalcularLocacaoConsiderandoDesconto() throws FilmeSemEstoqueExceptions, LocadoraException {
-		//cenário
-		Usuario usuario = usiBuilder().agora();;
-				
-		//Ação
-		Locacao resultado = service.alugarFilme(usuario,filmes);
-		
-		//Verificação
-		Assert.assertThat(resultado.getValor(), is(ValorLocacao));
-		System.out.println("!");
+
+	@Parameters(name="{2}")
+	public static Collection<Object[]> getParametros() {
+		return Arrays.asList(new Object[][] { 
+				{ Arrays.asList(sonic,   frozeen2), 8.0, "2 Filmes: Sem desconto" },
+				{ Arrays.asList(sonic,   frozeen2, clubeDaLuta), 11.0, "3 Filmes: 25%" },
+				{ Arrays.asList(sonic,   frozeen2, clubeDaLuta, senhorDosAneis), 13.0, "4 Filmes: 50%" },
+				{ Arrays.asList(sonic,   frozeen2, clubeDaLuta, senhorDosAneis, harryPoter), 14.0, "5 Filmes: 75%" },
+				{ Arrays.asList(sonic,   frozeen2, clubeDaLuta, senhorDosAneis, harryPoter, asBranquelas), 14.0, "6 Filmes: 100%"},
+				{ Arrays.asList(sonic,   frozeen2, clubeDaLuta, senhorDosAneis, harryPoter, asBranquelas, genteGrande), 18.0, "7 Filmes: Sem desconto" } });
 	}
-	
+
 	@Test
-	public void print () {
-		System.out.println(ValorLocacao);
-	}
+	public void deveCalcularValorLocacaoConsiderandoDescontos() throws FilmeSemEstoqueExceptions, LocadoraException {
+		// cenario
+		Usuario usuario = usiBuilder().agora();
 
+		// acao
+		Locacao resultado = service.alugarFilme(usuario, filmes);
+
+		// verificacao
+		Assert.assertThat(resultado.getValor(), is(valorLocacao));
+		
+	}
 	
 	
 	
