@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -28,6 +29,7 @@ import  org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -72,8 +74,14 @@ public class LocalizacaoServiceTeste {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
+		System.out.println("Inicializando 2...");
 	}
 	
+	@After
+	public void tearDown() {
+		System.out.println("Finalizando 2...");
+		
+	}
 	//Metodos de Teste--------------------------------------------
 	@Test
 	public void devaAlugarFilme() throws Exception {
@@ -231,6 +239,27 @@ public class LocalizacaoServiceTeste {
 	
 	
 	}
+
+	@Test
+	public void deveProrrogarUmaLocacao() {
+		//Cenário 
+		Locacao locacao = umLocacao().agora();
+		
+		//Ação 
+		service.prorrogarLocacao(locacao, 3);
+		
+		//Verificação 
+		ArgumentCaptor<Locacao>argumentCaptor = ArgumentCaptor.forClass(Locacao.class);
+		Mockito.verify(dao).salvar(argumentCaptor.capture());
+		Locacao locacaoRetornada = argumentCaptor.getValue();
+		
+		error.checkThat(locacaoRetornada.getValor(), is(12.0));
+		error.checkThat(locacaoRetornada.getDataLocacao(), ehHoje());
+		error.checkThat(locacaoRetornada.getDataRetorno(), ehHojeComDiferencaDias(3));
+	}
+
+
+
 }
 
 
